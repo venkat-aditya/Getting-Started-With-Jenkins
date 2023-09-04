@@ -1,0 +1,49 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  publishedFilesArtifactName: 'publishFiles'
+
+steps:
+    - checkout: self
+      displayName: Checkout repository
+
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '3.1.x'
+        includePreviewVersions: true
+
+    - script: >-
+        dotnet restore
+        --force
+        --no-cache
+        --no-dependencies
+        --packages .nuget
+        /p:TargetLatestRuntimePatch=true
+      displayName: Restore dependencies
+
+    - script: >-
+        dotnet publish
+        --self-contained false
+        --no-restore
+        --no-dependencies
+        --configuration $(dotnetBuildConfiguration)
+        /p:TargetLatestRuntimePatch=true
+      displayName: Build assemblies
+    - task: CopyFiles@2
+      displayName: Prepare services artifacts
+      inputs:
+        contents: "**"
+        targetFolder: $(publishedFilesArtifactName)
+        cleanTargetFolder: true
+
+    - publish: $(publishedFilesArtifactName)
+      artifact: $(publishedFilesArtifactName)
+      displayName: Publish services artifacts

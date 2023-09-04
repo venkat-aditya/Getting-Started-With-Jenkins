@@ -24,14 +24,14 @@ steps:
       inputs:
         command: restore
         projects: '**/*.csproj'
-        arguments: '--force --no-cache --no-dependencies --packages .nuget /p:TargetLatestRuntimePatch=true'
+        arguments: '--force --runtime linux-x64 --no-cache --no-dependencies --packages .nuget /p:TargetLatestRuntimePatch=true'
 
     - task: DotNetCoreCLI@2
       displayName: 'Build Assemblies'
       inputs:
         command: publish
         projects: '**/*.csproj'
-        arguments: '--self-contained false --no-restore --no-dependencies --configuration $(dotnetBuildConfiguration) /p:TargetLatestRuntimePatch=true'
+        arguments: '--self-contained false --runtime linux-x64 --no-restore --no-dependencies --configuration $(dotnetBuildConfiguration) /p:TargetLatestRuntimePatch=true'
 
     - task: CopyFiles@2
       displayName: Prepare services artifacts

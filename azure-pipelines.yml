@@ -30,7 +30,7 @@ steps:
       inputs:
         command: publish
         projects: '**/*.csproj'
-        arguments: '--configuration $(dotnetBuildConfiguration)'
+        arguments: '--configuration Release'
 
     - task: CopyFiles@2
       displayName: Prepare services artifacts

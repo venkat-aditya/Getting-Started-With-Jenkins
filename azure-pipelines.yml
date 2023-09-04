@@ -19,24 +19,26 @@ steps:
         packageType: 'sdk'
         version: '3.1.x'
         includePreviewVersions: true
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet restore'
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
 
-    - script: >-
-        dotnet restore
-        --force
-        --no-cache
-        --no-dependencies
-        --packages .nuget
-        /p:TargetLatestRuntimePatch=true
-      displayName: Restore dependencies
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore dependencies'
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+        arguments: '--force --no-cache --no-dependencies --packages .nuget /p:TargetLatestRuntimePatch=true'
 
-    - script: >-
-        dotnet publish
-        --self-contained false
-        --no-restore
-        --no-dependencies
-        --configuration $(dotnetBuildConfiguration)
-        /p:TargetLatestRuntimePatch=true
-      displayName: Build assemblies
+    - task: DotNetCoreCLI@2
+      displayName: 'Build Assemblies'
+      inputs:
+        command: publish
+        projects: '**/*.csproj'
+        arguments: '--self-contained false --no-restore --no-dependencies --configuration $(dotnetBuildConfiguration) /p:TargetLatestRuntimePatch=true'
+
     - task: CopyFiles@2
       displayName: Prepare services artifacts
       inputs:

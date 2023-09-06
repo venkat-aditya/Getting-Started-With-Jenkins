@@ -1,0 +1,41 @@
+parameters:
+  solutionPath:
+jobs:
+- job: ContinousIntegrationForDotnetCore
+  displayName: CI for DotnetCore
+  variables:
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+    publishedFilesArtifactName: 'publishFiles'
+  steps:
+      - checkout: self
+        displayName: Checkout repository
+
+      - task: UseDotNet@2
+        inputs:
+          packageType: 'sdk'
+          version: '5.x'
+          includePreviewVersions: true
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore dependencies'
+        inputs:
+          command: restore
+          projects: '$(solutionPath)'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build Assemblies'
+        inputs:
+          command: publish
+          projects: '$(solutionPath)'
+          arguments: '--configuration $(buildConfiguration)'
+
+      - task: CopyFiles@2
+        displayName: Prepare services artifacts
+        inputs:
+          contents: "**"
+          targetFolder: $(publishedFilesArtifactName)
+          cleanTargetFolder: true
+
+      - publish: $(publishedFilesArtifactName)
+        artifact: $(publishedFilesArtifactName)
+        displayName: Publish services artifacts
